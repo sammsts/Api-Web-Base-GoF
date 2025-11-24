@@ -1,14 +1,16 @@
-﻿using Application.Interfaces;
-using Application.Services;
-using Infrastructure.Services;
-using Infrastructure.Persistence;
-using Domain.Configurations;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
-using Application.Strategies;
+﻿using ApiWebBase.Factories;
 using Application.Commands;
-using ApiWebBase.Factories;
+using Application.Interfaces;
+using Application.Observers;
+using Application.Services;
+using Application.Strategies;
+using Domain.Configurations;
+using Infrastructure.Adapters;
+using Infrastructure.Persistence;
+using Infrastructure.Services;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ApiWebBase.Infrastructure
 {
@@ -45,6 +47,13 @@ namespace ApiWebBase.Infrastructure
 
             // 5. FACTORY METHOD (Criação de Logs)
             services.AddScoped<IAuditLogFactory, AuditLogFactory>();
+
+            // 6. OBSERVER (Notificação de Auditoria)
+            services.AddScoped<IAuditObserver, SecurityAlertObserver>();
+
+            // 7. ADAPTER (Registra o Adapter como um Observer também)
+            // O AuditService vai receber agora dois observadores: o de Alerta e o Adapter do Legado.
+            services.AddScoped<IAuditObserver, LegacyLoggerAdapter>();
 
             #endregion
 
